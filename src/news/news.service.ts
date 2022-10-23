@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { News, UserDataNews } from './news.interface';
+import { News, UserDataNews } from './news.types';
 
 @Injectable()
 export class NewsService {
@@ -7,7 +7,7 @@ export class NewsService {
 
     create(userDataNews: UserDataNews): boolean {
         const d = new Date();
-        const news: News = { ...userDataNews, id: d.getTime(), createdAt: d };
+        const news: News = { ...userDataNews, id: d.getTime().toString(), createdAt: d };
 
         this.news.push(news);
         return true;
@@ -17,13 +17,13 @@ export class NewsService {
         return this.news;
     }
 
-    findById(id: number): News | null {
+    findById(id: string): News | null {
         const item = this.news.find(item => item.id === id);
         return item ? item : null;
     }
 
-    update(id: number, userDataNews: UserDataNews): boolean {
-        const idx: number = this.news.findIndex(item => item.id == id);
+    update(id: string, userDataNews: UserDataNews): boolean {
+        const idx: number = this.news.findIndex(item => item.id === id);
 
         if (idx >= 0)
             this.news[idx] = { ...this.news[idx], ...userDataNews };
@@ -31,8 +31,8 @@ export class NewsService {
         return idx >= 0;
     }
 
-    delete(id: number, userDataNews: UserDataNews): boolean {
-        const idx: number = this.news.findIndex(item => item.id == id);
+    delete(id: string): boolean {
+        const idx: number = this.news.findIndex(item => item.id === id);
 
         if (idx >= 0)
             this.news.splice(idx, 1);
