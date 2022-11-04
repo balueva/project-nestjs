@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { Comment, UserComment } from './comments.types';
+import { Comment } from './comments.types';
+import { CommentsPropsDto } from './dtos/comments-props.dto';
 
 @Injectable()
 export class CommentsService {
     private readonly comments = {};
 
-    async create(newsId: string, userComment: UserComment): Promise<number> {
+    async create(newsId: string, userComment: CommentsPropsDto): Promise<number> {
         if (!this.comments?.[newsId])
             this.comments[newsId] = [];
 
-        return this.comments[newsId].push({ id: Date.now().toString(), text: userComment.text });
+        return this.comments[newsId].push({ id: Date.now().toString(), text: userComment.text, avatar: userComment.avatar });
     }
 
     async findAll(newsId: string): Promise<Comment[]> {
@@ -19,7 +20,7 @@ export class CommentsService {
             return [];
     }
 
-    async update(newsId: string, commentId: string, newComment: UserComment): Promise<boolean> {
+    async update(newsId: string, commentId: string, newComment: CommentsPropsDto): Promise<boolean> {
         let idx: number = -1;
 
         if (this.comments?.[newsId])

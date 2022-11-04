@@ -1,37 +1,58 @@
-import { Controller, Get, Post, Query, Body, Delete, Param, Put } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, Delete, Param, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { Comment, UserComment } from './comments.types';
+import { Comment } from './comments.types';
+import { CommentsIdDto } from './dtos/comments-id.dto';
+import { CommentsPropsDto } from './dtos/comments-props.dto';
+import { CommentsNewsidDto } from './dtos/comments-newsid.dto';
+import { diskStorage } from 'multer';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { HelperFileLoader } from '../../utils/helperFileLoader';
 
-const QUERY_NEWS_ID = 'newsId';
-const PARAM_COMMENT_ID = 'id';
+const PATH_COMMENTS = '/comments-static/';
+const helperFileLoader = new HelperFileLoader();
+helperFileLoader.path = PATH_COMMENTS;
 
 @Controller('comments')
 export class CommentsController {
     constructor(private readonly commentsService: CommentsService) { };
 
     @Get('all')
-    getAll(@Query(QUERY_NEWS_ID) newsId: string): Promise<Comment[]> {
-        return this.commentsService.findAll(newsId)
+    getAll(@Query() query: CommentsNewsidDto): Promise<Comment[]> {
+        return this.commentsService.findAll(query.newsId)
     }
 
     @Post()
-    create(@Query(QUERY_NEWS_ID) newsId: string, @Body() userComment: UserComment): Promise<number> {
-        return this.commentsService.create(newsId, userComment);
+    @UseInterceptors(
+        FilesInterceptor('avatar', 1, {
+            storage: diskStorage({
+                destination: helperFileLoader.destinationPath,
+                filename: helperFileLoader.customFileName,
+            }),
+        }),
+    )
+    create(@Query() query: CommentsNewsidDto, @Body() userComment: CommentsPropsDto,
+        @UploadedFiles() avatar: Express.Multer.File): Promise<number> {
+        let avatarPath;
+        if (avatar && avatar[0]?.filename?.length > 0) {
+            avatarPath = PATH_COMMENTS + avatar[0].filename;
+        }
+
+        return this.commentsService.create(query.newsId, { ...userComment, avatar: avatarPath });
     }
 
-    @Put(`:${PARAM_COMMENT_ID}`)
-    update(@Query(QUERY_NEWS_ID) newsId: string, @Param(PARAM_COMMENT_ID) commentId: string,
-        @Body() newComment: UserComment): Promise<boolean> {
-        return this.commentsService.update(newsId, commentId, newComment);
+    @Put(':id')
+    update(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto,
+        @Body() newComment: CommentsPropsDto): Promise<boolean> {
+        return this.commentsService.update(query.newsId, param.id, newComment);
     }
 
     @Delete('all')
-    deleteAll(@Query(QUERY_NEWS_ID) newsId: string): Promise<boolean> {
-        return this.commentsService.deleteAll(newsId);
+    deleteAll(@Query() query: CommentsNewsidDto): Promise<boolean> {
+        return this.commentsService.deleteAll(query.newsId);
     }
 
-    @Delete(`:${PARAM_COMMENT_ID}`)
-    delete(@Query(QUERY_NEWS_ID) newsId: string, @Param(PARAM_COMMENT_ID) commentId: string): Promise<boolean> {
-        return this.commentsService.delete(newsId, commentId);
+    @Delete(':id')
+    delete(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto): Promise<boolean> {
+        return this.commentsService.delete(query.newsId, param.id);
     }
 }

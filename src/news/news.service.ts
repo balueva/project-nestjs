@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { News, UserDataNews } from './news.types';
+import { News } from './news.types';
+import { NewsCreateDto } from './dtos/news-create.dto';
 
 @Injectable()
 export class NewsService {
     private readonly news: News[] = [];
 
-    create(userDataNews: UserDataNews): boolean {
+    create(userDataNews: NewsCreateDto): boolean {
         const d = new Date();
         const news: News = { ...userDataNews, id: d.getTime().toString(), createdAt: d };
 
@@ -22,7 +23,7 @@ export class NewsService {
         return item ? item : null;
     }
 
-    update(id: string, userDataNews: UserDataNews): boolean {
+    update(id: string, userDataNews: NewsCreateDto): boolean {
         const idx: number = this.news.findIndex(item => item.id === id);
 
         if (idx >= 0)

@@ -5,7 +5,7 @@ export const commentsTemplate = (comments: Comment[]) => {
         return `<p>Нет комментариев.</p>`;
     else {
         let html = '';
-        comments.forEach(item => html += `<p>${item.text}</p>`)
+        comments.forEach(item => html += `<div><p>${item.text}</p><img src="http://localhost:3000/${item?.avatar}" class="card-img-bottom"></div>`)
         return html;
     }
 };
