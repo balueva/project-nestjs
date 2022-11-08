@@ -5,6 +5,10 @@ export class CommentsPropsDto {
     @IsString()
     text: string;
 
+    @ValidateIf(o => o.author)
+    @IsString()
+    author: string
+
     @ValidateIf(o => o.avatar)
     @IsString()
     avatar: string

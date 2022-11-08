@@ -10,7 +10,7 @@ export class CommentsService {
         if (!this.comments?.[newsId])
             this.comments[newsId] = [];
 
-        return this.comments[newsId].push({ id: Date.now().toString(), text: userComment.text, avatar: userComment.avatar });
+        return this.comments[newsId].push({ id: Date.now().toString(), text: userComment.text, author: userComment.author, avatar: userComment.avatar });
     }
 
     async findAll(newsId: string): Promise<Comment[]> {

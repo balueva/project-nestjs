@@ -1,6 +1,6 @@
 export type Comment = {
     id: string;
-    text: string
+    text: string;
+    author: string;
+    avatar: string
 }
-
-export type UserComment = Omit<Comment, 'id'>;

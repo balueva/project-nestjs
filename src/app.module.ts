@@ -6,12 +6,14 @@ import { CalculatorModule } from './calculator/calculator.module';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MailModule } from './mail/mail.module';
 
 @Module({
-  imports: [NewsModule, CalculatorModule,
+  imports: [NewsModule, CalculatorModule, MailModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
-    })],
+    })
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

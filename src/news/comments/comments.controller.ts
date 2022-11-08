@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, Body, Delete, Param, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, Delete, Param, Put, UseInterceptors, UploadedFiles, Render } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { Comment } from './comments.types';
 import { CommentsIdDto } from './dtos/comments-id.dto';

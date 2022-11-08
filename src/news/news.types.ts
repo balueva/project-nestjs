@@ -5,5 +5,3 @@ export type News = {
     author: string;
     createdAt: Date
 }
-
-export type UserDataNews = Omit<News, 'id' | 'createdAt' | 'comments'>;
