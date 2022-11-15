@@ -1,43 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { News } from './news.types';
-import { NewsCreateDto } from './dtos/news-create.dto';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NewsEntity } from './news.entity';
 
 @Injectable()
 export class NewsService {
-    private readonly news: News[] = [];
+    constructor(
+        @InjectRepository(NewsEntity)
+        private readonly newsRepository: Repository<NewsEntity>,
+    ) { }
 
-    create(userDataNews: NewsCreateDto): boolean {
-        const d = new Date();
-        const news: News = { ...userDataNews, id: d.getTime().toString(), createdAt: d };
-
-        this.news.push(news);
-        return true;
+    async create(news: NewsEntity) {
+        return await this.newsRepository.save(news);
     }
 
-    findAll(): News[] {
-        return this.news;
+    async findAll(): Promise<NewsEntity[]> {
+        return await this.newsRepository.find({});
     }
 
-    findById(id: string): News | null {
-        const item = this.news.find(item => item.id === id);
-        return item ? item : null;
+    async findById(id: number): Promise<NewsEntity | null> {
+        return await this.newsRepository.findOneBy({ id });
     }
 
-    update(id: string, userDataNews: NewsCreateDto): boolean {
-        const idx: number = this.news.findIndex(item => item.id === id);
-
-        if (idx >= 0)
-            this.news[idx] = { ...this.news[idx], ...userDataNews };
-
-        return idx >= 0;
+    async update(news: NewsEntity) {
+        return await this.newsRepository.save(news);
     }
 
-    delete(id: string): boolean {
-        const idx: number = this.news.findIndex(item => item.id === id);
+    async delete(id: number): Promise<NewsEntity | null> {
+        const news: NewsEntity | null = await this.findById(id);
 
-        if (idx >= 0)
-            this.news.splice(idx, 1);
+        return news ? await this.newsRepository.remove(news) : null;
+    }
 
-        return idx >= 0;
+    async findByUser(userId: number): Promise<NewsEntity[] | null> {
+        return await this.newsRepository.find({ where: { user: { id: userId } } });
     }
 }

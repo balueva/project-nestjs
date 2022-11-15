@@ -9,7 +9,11 @@ export class NewsCreateDto {
     @IsString()
     description: string;
 
-    @ValidateIf(o => o.author)
+    @ValidateIf(o => o.authorId)
     @IsString()
-    author: string
+    authorId: number
+
+    @IsNotEmpty()
+    @IsString()
+    categoryId: number
 }

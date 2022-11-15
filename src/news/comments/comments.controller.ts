@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Query, Body, Delete, Param, Put, UseInterceptors, UploadedFiles, Render } from '@nestjs/common';
+import {
+    Controller, Get, Post, Query, Body, Delete, Param, Put, UseInterceptors,
+    UploadedFiles, Render, HttpException, HttpStatus
+} from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { Comment } from './comments.types';
 import { CommentsIdDto } from './dtos/comments-id.dto';
 import { CommentsPropsDto } from './dtos/comments-props.dto';
 import { CommentsNewsidDto } from './dtos/comments-newsid.dto';
-import { diskStorage } from 'multer';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { HelperFileLoader } from '../../utils/helperFileLoader';
+import { NewsService } from '../news.service';
+import { CommentsEntity } from './comments.entity';
+import { UsersService } from 'src/users/users.service';
 
 const PATH_COMMENTS = '/comments-static/';
 const helperFileLoader = new HelperFileLoader();
@@ -14,45 +17,63 @@ helperFileLoader.path = PATH_COMMENTS;
 
 @Controller('comments')
 export class CommentsController {
-    constructor(private readonly commentsService: CommentsService) { };
+    constructor(private readonly commentsService: CommentsService,
+        private readonly newsService: NewsService,
+        private readonly usersService: UsersService) { };
 
     @Get('all')
-    getAll(@Query() query: CommentsNewsidDto): Promise<Comment[]> {
-        return this.commentsService.findAll(query.newsId)
+    async getAll(@Query() query: CommentsNewsidDto) {
+        const newsEntity = await this.newsService.findById(+query.newsId);
+        if (!newsEntity)
+            throw new HttpException('Не существует такой новости', HttpStatus.BAD_REQUEST);
+
+        return await this.commentsService.findAll(query.newsId);
     }
+
 
     @Post()
-    @UseInterceptors(
-        FilesInterceptor('avatar', 1, {
-            storage: diskStorage({
-                destination: helperFileLoader.destinationPath,
-                filename: helperFileLoader.customFileName,
-            }),
-        }),
-    )
-    create(@Query() query: CommentsNewsidDto, @Body() userComment: CommentsPropsDto,
-        @UploadedFiles() avatar: Express.Multer.File): Promise<number> {
-        let avatarPath;
-        if (avatar && avatar[0]?.filename?.length > 0) {
-            avatarPath = PATH_COMMENTS + avatar[0].filename;
+    async create(@Query() query: CommentsNewsidDto, @Body() userComment: CommentsPropsDto) {
+        let userEntity = null;
+        if (userComment.author) {
+            userEntity = await this.usersService.findById(userComment.author);
+            if (!userEntity)
+                throw new HttpException('Не существует такого автора', HttpStatus.BAD_REQUEST);
         }
 
-        return this.commentsService.create(query.newsId, { ...userComment, avatar: avatarPath });
+        const newsEntity = await this.newsService.findById(query.newsId);
+        if (!newsEntity)
+            throw new HttpException('Не существует такой новости', HttpStatus.BAD_REQUEST);
+
+
+        const commentsEntity = new CommentsEntity();
+        commentsEntity.message = userComment.message;
+        commentsEntity.user = userEntity;
+        commentsEntity.news = newsEntity;
+        return await this.commentsService.create(commentsEntity);
     }
 
+
     @Put(':id')
-    update(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto,
-        @Body() newComment: CommentsPropsDto): Promise<boolean> {
-        return this.commentsService.update(query.newsId, param.id, newComment);
+    async update(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto,
+        @Body() newComment: CommentsPropsDto): Promise<CommentsEntity> {
+
+        const commentsEntity = await this.commentsService.findById(param.id);
+        if (!commentsEntity)
+            throw new HttpException('Не существует комментария', HttpStatus.BAD_REQUEST);
+
+        commentsEntity.message = newComment.message;
+        return await this.commentsService.update(commentsEntity);
     }
 
     @Delete('all')
-    deleteAll(@Query() query: CommentsNewsidDto): Promise<boolean> {
-        return this.commentsService.deleteAll(query.newsId);
+    async deleteAll(@Query() query: CommentsNewsidDto): Promise<CommentsEntity[] | null> {
+        return await this.commentsService.deleteAll(query.newsId);
     }
 
+
     @Delete(':id')
-    delete(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto): Promise<boolean> {
-        return this.commentsService.delete(query.newsId, param.id);
+    delete(@Query() query: CommentsNewsidDto, @Param() param: CommentsIdDto): Promise<CommentsEntity | null> {
+        return this.commentsService.delete(param.id);
     }
+
 }
