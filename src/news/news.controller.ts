@@ -1,6 +1,6 @@
 import {
     Controller, Get, Post, Body, Query, Res, HttpStatus, Param,
-    Render, HttpException, Req
+    Render, HttpException, Req, UseGuards
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { NewsCreateDto } from './dtos/news-create.dto';
@@ -11,6 +11,7 @@ import { MailService } from '../mail/mail.service';
 import { NewsEntity } from './news.entity';
 import { UsersService } from 'src/users/users.service';
 import { CategoriesService } from 'src/categories/categories.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('news')
 export class NewsController {
@@ -60,6 +61,7 @@ export class NewsController {
         }
     */
 
+    @UseGuards(JwtAuthGuard)
     @Post('create')
     async create(@Body() news: NewsCreateDto) {
 

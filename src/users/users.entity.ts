@@ -1,6 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { NewsEntity } from '../news/news.entity';
 import { CommentsEntity } from '../news/comments/comments.entity';
+import { Role } from '../auth/roles/role.enum';
+import { IsEnum } from 'class-validator';
 
 @Entity('users')
 export class UsersEntity {
@@ -17,7 +19,11 @@ export class UsersEntity {
     email: string;
 
     @Column('text')
-    role: string;
+    password: string;
+
+    @Column('text')
+    @IsEnum(Role)
+    roles: Role;
 
     @Column('text', { nullable: true })
     avatar: string;
