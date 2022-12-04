@@ -20,7 +20,11 @@ export class NewsService {
     }
 
     async findById(id: number): Promise<NewsEntity | null> {
-        return await this.newsRepository.findOneBy({ id });
+        //return await this.newsRepository.findOneBy({ id });
+        return await this.newsRepository.findOne({
+            where: { id: id },
+            relations: ['user']
+        });
     }
 
     async update(news: NewsEntity) {

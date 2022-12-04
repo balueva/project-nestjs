@@ -42,7 +42,6 @@ export class NewsController {
             console.log('all');
             return await this.newsService.findAll();
         }
-
     }
 
     @Get(':id')
@@ -50,6 +49,15 @@ export class NewsController {
         return await this.newsService.findById(+param.id);
     }
 
+    @Get(':id/detail')
+    @Render('news-detail')
+    async getNewsView(@Param() param: NewsIdDto) {
+        const news = await this.newsService.findById(+param.id);
+        //const comments = await this.commentService.findAll(+param.id);
+        //return htmlTemplate(newsTemplate(news, comments));
+        //console.log(news, comments);
+        return { news, title: 'lesson 07' };
+    }
     /*
         @Get(':id/detail')
         @Render('news')

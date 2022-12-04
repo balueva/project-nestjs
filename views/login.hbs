@@ -1,0 +1,38 @@
+<h3 class="card-text">Форма авторизации</h3>
+
+<form id="form" method="post">
+    <div class="mb-3">
+        <label for="username">Email</label>
+        <input type="email" id="email" name="username">
+    </div>
+    <div class="mb-3">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password">
+    </div>
+    <button type="submit" id="btnLogin">Войти</button>
+</form>
+
+<script>
+    const btn = document.getElementById('btnLogin')
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const form = document.getElementById('form');
+
+        const data = new FormData(form);
+        console.log(data);
+
+
+        fetch('127.0.0.1:3000/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json,
+                //'Autorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjY4OTM5NTczLCJleHAiOjE2Njg5NDMxNzN9.Y870Uttfal10AGH_d5q0TD-WnT7-bqC-K7KADLIsaHc'
+            },
+            body: data
+        })
+            .then(result => window.location.reload())
+            .catch(error => console.log(error));
+
+    })
+
+</script>

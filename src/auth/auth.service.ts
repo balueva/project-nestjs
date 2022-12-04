@@ -20,23 +20,21 @@ export class AuthService {
         return null;
     }
 
-    /*
-        async login(user: any) {
-            const payload = user;
-            return {
-                access_token: this.jwtService.sign(payload),
-            };
-        }
-    */
     async login(user: any) {
         const payload = { email: user.username, id: user.id };
+        console.log('login payload', payload);
         return {
             access_token: this.jwtService.sign(payload),
+            id: user.id
         };
     }
 
     async verify(token: string) {
         return this.jwtService.verify(token);
+    }
+
+    async decode(token: string) {
+        return this.jwtService.decode(token);
     }
 }
 

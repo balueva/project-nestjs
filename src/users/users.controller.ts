@@ -31,11 +31,19 @@ export class UsersController {
     async editProfile(@Req() req: Request) {
         const usersEntity = await this.usersService.findById(+req.params['id']);
 
-        //console.log('userEntity', usersEntity);
-
         if (!usersEntity)
             throw new HttpException('Не существует такого пользователя', HttpStatus.FORBIDDEN);
 
         return { user: usersEntity, title: 'lesson 06' }
+    }
+
+    @Get('roles/:id')
+    async getRoles(@Req() req: Request) {
+        const usersEntity = await this.usersService.findById(+req.params['id']);
+
+        if (!usersEntity)
+            throw new HttpException('Не существует такого пользователя', HttpStatus.FORBIDDEN);
+
+        return { roles: usersEntity.roles };
     }
 }

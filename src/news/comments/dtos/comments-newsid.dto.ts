@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CommentsNewsidDto {
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    newsId: number;
+    newsId: string;
 }
