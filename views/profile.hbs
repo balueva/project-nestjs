@@ -1,0 +1,46 @@
+<h3 class="card-text">Редактирование профиля пользователя {{user.email}}</h3>
+
+<form id="form" method="post">
+    <div class="mb-3">
+        <label for="firstName" class="form-label">Имя</label>
+        <input class="form-control" name="firstName" id="firstName" value="{{user.firstName}}">
+    </div>
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Автор</label>
+        <input class="form-control" name="lastName" id="lastName" value="{{user.lastName}}">
+    </div>
+    <div class="mb-3">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" value="{{user.password}}">
+    </div>
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{user.email}}">
+    </div>
+    <button type="submit" id="btnSave">Сохранить</button>
+</form>
+
+<script>
+    const btn = document.getElementById('btnSave')
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const form = document.getElementById('form');
+
+        const data = new FormData(form);
+        console.log(data);
+
+
+        fetch('/users', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Autorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjY4OTM5NTczLCJleHAiOjE2Njg5NDMxNzN9.Y870Uttfal10AGH_d5q0TD-WnT7-bqC-K7KADLIsaHc'
+            },
+            body: data
+        })
+            .then(result => window.location.reload())
+            .catch(error => console.log(error));
+
+    })
+
+</script>

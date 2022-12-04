@@ -1,0 +1,28 @@
+<h1>Внимание, редактирование новости!</h1>
+{{#if newsTitle}}
+<div>
+    <h3>Заголовок</h3>
+    <h4>Было:</h4>
+    <p>{{newsTitle.oldValue}}</p>
+    <h4>Стало:</h4>
+    <p>{{newsTitle.newValue}}</p>
+</div>
+{{/if}}
+{{#if newsDescription}}
+<div>
+    <h3>Содержание</h3>
+    <h4>Было:</h4>
+    <p>{{newsDescription.oldValue}}</p>
+    <h4>Стало:</h4>
+    <p>{{newsDescription.newValue}}</p>
+</div>
+{{/if}}
+{{#if newsCategory}}
+<div>
+    <h3>Категория</h3>
+    <h4>Было:</h4>
+    <p>{{newsCategory.oldValue}}</p>
+    <h4>Стало:</h4>
+    <p>{{newsCategory.newValue}}</p>
+</div>
+{{/if}}
